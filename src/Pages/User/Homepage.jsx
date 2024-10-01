@@ -3,6 +3,7 @@ import Header from '../../Components/User/Header/Header'
 import Home from '../../Components/User/Home/Home'
 import 'react-toastify/dist/ReactToastify.css';
 import Dashboard from '../../Components/User/Dashboard/Dashboard';
+import Chart from '../../Components/User/Chart/Chart';
 
 
 function Homepage() {
@@ -11,6 +12,7 @@ function Homepage() {
       <Header/>
       {/* <Home/> */}
       <Dashboard/>
+      {/* <Chart/> */}
     
      
     </div>

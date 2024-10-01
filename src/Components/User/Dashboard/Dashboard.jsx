@@ -62,7 +62,7 @@ const Dashboard = () => {
                     placeholder="Enter amount"
                     style={{height:'60px',marginTop:'20px'}}
                   />
-                  <button type="submit" className="btn btn-primary" style={{width:'100px',height:'60px'}}>Add Income</button>
+                  <button type="submit" className="btn btn-primary" style={{width:'100px',height:'60px',backgroundColor:'#343333'}}>Add Income</button>
                 </div>
               </form>
             </div>
@@ -77,20 +77,20 @@ const Dashboard = () => {
               <p className="card-text fs-2">${expenses.toFixed(2)}</p>
               <button 
                   className="btn btn-sm btn-primary float-end"  
-                  style={{ marginRight: '40px', width: '200px' }}
+                  style={{ marginRight: '-15px', height:'60px',backgroundColor:'#343333' }}
                    onClick={() => setShowExpenseModal(true)}
                 >
-                  +
+                  Add Expenses
                 </button>
             </div>
           </div>
         </div>
-        <div className="col-md-3">
-          <div className="card">
+        <div className="col-md-3" >
+          <div className="card" style={{height:'210px'}}>
             <div className="card-body">
               <h5 className="card-title">Current Savings</h5>
               <p className="card-text fs-2">${currentSavings.toFixed(2)}</p>
-              <small className="text-muted">Read-only (Income - Expenses)</small>
+              {/* <small className="text-muted">Read-only (Income - Expenses)</small> */}
             </div>
           </div>
         </div>
@@ -109,7 +109,7 @@ const Dashboard = () => {
                     placeholder="Set goal"
                     style={{height:'60px',marginTop:'20px'}}
                   />
-                  <button type="submit" className="btn btn-primary" style={{width:'100px',height:'60px'}}>Set Goal</button>
+                  <button type="submit" className="btn btn-primary" style={{width:'100px',height:'60px',backgroundColor:'#343333'}}>Set Goal</button>
                 </div>
               </form>
             </div>
