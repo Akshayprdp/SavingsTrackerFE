@@ -128,14 +128,15 @@ const Dashboard = () => {
     }
   };
 
+
   const handleDeleteIncome = async (incomeId) => {
     const userId = localStorage.getItem('userId'); // Get userId from local storage
     try {
-      const response = await deleteIncome(userId, incomeId); // Call API to delete income
+      const response = await deleteIncome(userId, incomeId); // Call deleteIncome API
       if (response.status === 200) {
-        // Update income state after deletion
-        setIncomes((prevIncomes) => prevIncomes.filter((income) => income.id !== incomeId));
-        fetchIncome(); // Refresh income data
+        // Update state to remove deleted income
+        setIncomes((prevIncomes) => prevIncomes.filter((income) => income._id !== incomeId)); // Remove income from the list
+        setIncome((prevIncome) => prevIncome - incomes.find((income) => income._id === incomeId).amount); // Update total income
       } else {
         console.error('Failed to delete income');
       }
@@ -143,6 +144,9 @@ const Dashboard = () => {
       console.error('Error deleting income:', error);
     }
   };
+
+
+  
 
   const currentSavings = income - expenses;
 
@@ -152,7 +156,7 @@ const Dashboard = () => {
       <div className="row mb-4">
         <div className="col-md-3">
           <div className="card">
-            <div className="card-body">
+            <div className="card-body" style={{height:'210px'}}>
               <h5 className="card-title">Income</h5>
               {incomes.map((income, index) => (
                 <div key={index} className="d-flex justify-content-between align-items-center">
@@ -160,7 +164,7 @@ const Dashboard = () => {
                   <AiOutlineDelete
                     className="text-danger"
                     style={{ cursor: 'pointer', marginLeft: '10px' }}
-                    onClick={() => handleDeleteIncome(income.id)} // Pass the income ID for deletion
+                    onClick={() =>handleDeleteIncome(income._id) } // Pass the income ID for deletion
                   />
                 </div>
               ))}
@@ -228,7 +232,62 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-      {/* Expenses modal can be implemented here */}
+      {showExpenseModal && (
+        <div className="modal show" style={{ display: 'block' }}>
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Add Expense</h5>
+                <button type="button" className="btn-close" onClick={() => setShowExpenseModal(false)}></button>
+              </div>
+              <div className="modal-body">
+                <form onSubmit={handleExpenseSubmit}>
+                  <div className="mb-3">
+                    <label htmlFor="expenseDate" className="form-label" style={{color:'black'}}>Date</label>
+                    <input
+                      type="date"
+                      id="expenseDate"
+                      className="form-control"
+                      value={expenseDate}
+                      onChange={(e) => setExpenseDate(e.target.value)}
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label htmlFor="expenseCategory" className="form-label" style={{color:'black'}}>Category</label>
+                    <input
+                      type="text"
+                      id="expenseCategory"
+                      className="form-control"
+                      value={expenseCategory}
+                      onChange={(e) => setExpenseCategory(e.target.value)}
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label htmlFor="expenseAmount" className="form-label" style={{color:'black'}}>Amount</label>
+                    <input
+                      type="number"
+                      id="expenseAmount"
+                      className="form-control"
+                      value={expenseAmount}
+                      onChange={(e) => setExpenseAmount(e.target.value)}
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label htmlFor="expenseDescription" className="form-label" style={{color:'black'}}>Description</label>
+                    <textarea
+                      id="expenseDescription"
+                      className="form-control"
+                      value={expenseDescription}
+                      onChange={(e) => setExpenseDescription(e.target.value)}
+                    />
+                  </div>
+                  <button type="submit" className="btn btn-primary" style={{marginLeft:'70px',backgroundColor:'#343333'}}>Add Expense</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

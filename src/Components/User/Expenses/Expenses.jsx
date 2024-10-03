@@ -45,6 +45,7 @@ const Expenses = () => {
       setExpenses(expenses.filter(expense => expense._id !== expenseId)); // Update the state to remove the deleted expense
     } catch (error) {
       console.error('Error deleting expense:', error);
+     
     }
   };
 
