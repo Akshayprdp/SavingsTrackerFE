@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
-import { addExpense, addincome, addsavings } from '../../../Services/UserApi'; // Adjust the path as per your file structure
+import React, { useState, useEffect } from 'react';
+import { addExpense, addincome, addsavings, getIncome, deleteIncome } from '../../../Services/UserApi'; // Adjust the path as per your file structure
+import { AiOutlineDelete } from 'react-icons/ai'; // Import the delete icon
 
 const Dashboard = () => {
-  const [income, setIncome] = useState(0); // Initialize income to 0
+  const [income, setIncome] = useState(0);
+  const [incomes, setIncomes] = useState([]); // Initialize incomes as an array
   const [expenses, setExpenses] = useState(0);
   const [savingsGoal, setSavingsGoal] = useState(0);
   const [newIncome, setNewIncome] = useState('');
@@ -13,32 +15,51 @@ const Dashboard = () => {
   const [expenseAmount, setExpenseAmount] = useState('');
   const [expenseDescription, setExpenseDescription] = useState('');
 
+  // Fetch income data when the component mounts
+  useEffect(() => {
+    fetchIncome();
+  }, []); 
+
+  const fetchIncome = async () => {
+    const userId = localStorage.getItem('userId'); // Get userId from local storage
+    try {
+      const response = await getIncome(userId);
+      if (response && response.data) {
+        const incomeEntries = response.data; // Assume response.data is an array of income entries
+        setIncomes(incomeEntries); // Set incomes from response
+        const totalIncome = incomeEntries.reduce((acc, curr) => acc + curr.amount, 0); // Calculate total income
+        setIncome(totalIncome); // Update income state with total
+      }
+    } catch (error) {
+      console.error('Error fetching income:', error);
+    }
+  };
+
   const handleIncomeSubmit = async (e) => {
     e.preventDefault();
     const amount = parseFloat(newIncome);
     if (isNaN(amount)) return;
 
-    // Get userId from local storage
     const userId = localStorage.getItem('userId'); // Ensure 'userId' is stored in localStorage
-
-    // Prepare the income data
     const incomeData = {
       userId,
       amount,
     };
 
     try {
-      // Call the API to add income
       const response = await addincome(incomeData);
       if (response.status === 200) {
-        // Successfully added income, update UI
-        setIncome(income + amount);
+        // Update income list and total income
+        setIncomes((prevIncomes) => [...prevIncomes, { amount }]); // Add new income entry
+        setIncome((prevIncome) => prevIncome + amount); // Update total income
         setNewIncome(''); // Clear input field
       } else {
         console.error('Failed to add income');
       }
     } catch (error) {
       console.error('Error adding income:', error);
+    } finally {
+      await fetchIncome(); // Refresh income data after adding
     }
   };
 
@@ -47,20 +68,15 @@ const Dashboard = () => {
     const amount = parseFloat(newSavingsGoal);
     if (isNaN(amount)) return;
 
-    // Get userId from local storage
     const userId = localStorage.getItem('userId'); // Ensure 'userId' is stored in localStorage
-
-    // Prepare the savings goal data
     const savingsData = {
       userId,
       goal: amount, // Assuming the API expects a key 'goal' for the savings amount
     };
 
     try {
-      // Call the API to add savings goal
       const response = await addsavings(savingsData);
       if (response.status === 200) {
-        // Successfully added savings goal, update UI
         setSavingsGoal(amount);
         setNewSavingsGoal(''); // Clear input field
       } else {
@@ -68,6 +84,8 @@ const Dashboard = () => {
       }
     } catch (error) {
       console.error('Error adding savings goal:', error);
+    } finally {
+      await fetchIncome(); // Refresh income data after adding
     }
   };
 
@@ -76,28 +94,23 @@ const Dashboard = () => {
     const amount = parseFloat(expenseAmount);
     if (isNaN(amount)) return;
 
-    // Get userId from local storage
     const userId = localStorage.getItem('userId'); // Ensure 'userId' is stored in localStorage
-
-    // Prepare the expense data
     const expenseData = {
       userId,
       expenses: [
         {
           date: expenseDate,
           category: expenseCategory,
-          amount: expenseAmount,
+          amount,
           description: expenseDescription,
         },
       ],
     };
 
     try {
-      // Call the API to add expense
       const response = await addExpense(expenseData);
       if (response.status === 200) {
-        // Successfully added expense, update UI
-        setExpenses(expenses + amount);
+        setExpenses((prevExpenses) => prevExpenses + amount);
         setShowExpenseModal(false);
 
         // Reset form fields
@@ -110,6 +123,24 @@ const Dashboard = () => {
       }
     } catch (error) {
       console.error('Error adding expense:', error);
+    } finally {
+      await fetchIncome(); // Refresh income data after adding
+    }
+  };
+
+  const handleDeleteIncome = async (incomeId) => {
+    const userId = localStorage.getItem('userId'); // Get userId from local storage
+    try {
+      const response = await deleteIncome(userId, incomeId); // Call API to delete income
+      if (response.status === 200) {
+        // Update income state after deletion
+        setIncomes((prevIncomes) => prevIncomes.filter((income) => income.id !== incomeId));
+        fetchIncome(); // Refresh income data
+      } else {
+        console.error('Failed to delete income');
+      }
+    } catch (error) {
+      console.error('Error deleting income:', error);
     }
   };
 
@@ -123,20 +154,32 @@ const Dashboard = () => {
           <div className="card">
             <div className="card-body">
               <h5 className="card-title">Income</h5>
-              <p className="card-text fs-2">${income.toFixed(2)}</p>
-              <form onSubmit={handleIncomeSubmit} className="mt-2">
-                <div className="input-group">
-                  <input
-                    type="number"
-                    className="form-control"
-                    value={newIncome}
-                    onChange={(e) => setNewIncome(e.target.value)}
-                    placeholder="Enter amount"
-                    style={{ height: '60px', marginTop: '20px' }}
+              {incomes.map((income, index) => (
+                <div key={index} className="d-flex justify-content-between align-items-center">
+                  <p className="card-text fs-2">${income.amount.toFixed(2)}</p>
+                  <AiOutlineDelete
+                    className="text-danger"
+                    style={{ cursor: 'pointer', marginLeft: '10px' }}
+                    onClick={() => handleDeleteIncome(income.id)} // Pass the income ID for deletion
                   />
-                  <button type="submit" className="btn btn-primary" style={{ width: '100px', height: '60px', backgroundColor: '#343333' }}>Add Income</button>
                 </div>
-              </form>
+              ))}
+              {/* Conditionally render income input if total income is 0 */}
+              {income <= 0 && (
+                <form onSubmit={handleIncomeSubmit} className="mt-2">
+                  <div className="input-group">
+                    <input
+                      type="number"
+                      className="form-control"
+                      value={newIncome}
+                      onChange={(e) => setNewIncome(e.target.value)}
+                      placeholder="Enter amount"
+                      style={{ height: '60px', marginTop: '20px' }}
+                    />
+                    <button type="submit" className="btn btn-primary" style={{ width: '100px', height: '60px', backgroundColor: '#343333' }}>Add Income</button>
+                  </div>
+                </form>
+              )}
             </div>
           </div>
         </div>
@@ -175,7 +218,7 @@ const Dashboard = () => {
                     className="form-control"
                     value={newSavingsGoal}
                     onChange={(e) => setNewSavingsGoal(e.target.value)}
-                    placeholder="Set goal"
+                    placeholder="Enter goal amount"
                     style={{ height: '60px', marginTop: '20px' }}
                   />
                   <button type="submit" className="btn btn-primary" style={{ width: '100px', height: '60px', backgroundColor: '#343333' }}>Set Goal</button>
@@ -185,67 +228,7 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-
-      {/* Expense Modal */}
-      <div className={`modal ${showExpenseModal ? 'd-block' : ''}`} tabIndex="-1">
-        <div className="modal-dialog">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title">Add Expense</h5>
-              <button type="button" className="btn-close" onClick={() => setShowExpenseModal(false)}></button>
-            </div>
-            <div className="modal-body">
-              <form onSubmit={handleExpenseSubmit}>
-                <div className="mb-3">
-                  <label htmlFor="expenseDate" className="form-label" style={{ color: 'black' }}>Date</label>
-                  <input
-                    type="date"
-                    className="form-control"
-                    id="expenseDate"
-                    value={expenseDate}
-                    onChange={(e) => setExpenseDate(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="expenseCategory" className="form-label" style={{ color: 'black' }}>Category</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="expenseCategory"
-                    value={expenseCategory}
-                    onChange={(e) => setExpenseCategory(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="expenseAmount" className="form-label" style={{ color: 'black' }}>Amount</label>
-                  <input
-                    type="number"
-                    className="form-control"
-                    id="expenseAmount"
-                    value={expenseAmount}
-                    onChange={(e) => setExpenseAmount(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="expenseDescription" className="form-label" style={{ color: 'black' }}>Description</label>
-                  <textarea
-                    className="form-control"
-                    id="expenseDescription"
-                    value={expenseDescription}
-                    onChange={(e) => setExpenseDescription(e.target.value)}
-                    required
-                  ></textarea>
-                </div>
-                <button type="submit" className="btn btn-primary" style={{ backgroundColor: '#343333',marginLeft:'70px' }}>Add Expense</button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-      {showExpenseModal && <div className="modal-backdrop fade show" onClick={() => setShowExpenseModal(false)}></div>}
+      {/* Expenses modal can be implemented here */}
     </div>
   );
 };
