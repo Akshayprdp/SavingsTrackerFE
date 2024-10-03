@@ -1,5 +1,5 @@
-import {userInstance,Hostedapiinstance} from "../Axios/Axiosinstance"
-import axios from 'axios';
+import {userInstance} from "../Axios/Axiosinstance"
+
 
 export const userRegister=(values)=>{
     return userInstance.post("/signup",{...values})
@@ -45,5 +45,13 @@ export const getIncome = (userId) => {
 
 export const addsavings = (values) => {
   return userInstance.post('/addsaving',{...values});
+};
+
+export const getsavings = (userId) => {
+  return userInstance.get(`/savings/${userId}`);
+};
+
+export const deleteSavingsGoal = (userId, savingsId) => {
+  return userInstance.delete(`/removesavings/${userId}/${savingsId}`);
 };
 

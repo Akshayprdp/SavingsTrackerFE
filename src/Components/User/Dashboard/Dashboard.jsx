@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { addExpense, addincome, addsavings, getIncome, deleteIncome } from '../../../Services/UserApi'; // Adjust the path as per your file structure
+import { addExpense, addincome, addsavings, getIncome, deleteIncome, getsavings, deleteSavingsGoal,getExpenses } from '../../../Services/UserApi'; // Adjust the path as per your file structure
 import { AiOutlineDelete } from 'react-icons/ai'; // Import the delete icon
 
 const Dashboard = () => {
   const [income, setIncome] = useState(0);
-  const [incomes, setIncomes] = useState([]); // Initialize incomes as an array
+  const [incomes, setIncomes] = useState([]);
   const [expenses, setExpenses] = useState(0);
-  const [savingsGoal, setSavingsGoal] = useState(0);
+  const [savings, setSavings] = useState([]);
   const [newIncome, setNewIncome] = useState('');
   const [newSavingsGoal, setNewSavingsGoal] = useState('');
   const [showExpenseModal, setShowExpenseModal] = useState(false);
@@ -15,23 +15,36 @@ const Dashboard = () => {
   const [expenseAmount, setExpenseAmount] = useState('');
   const [expenseDescription, setExpenseDescription] = useState('');
 
-  // Fetch income data when the component mounts
   useEffect(() => {
     fetchIncome();
-  }, []); 
+    fetchSavingsGoal();
+    fetchExpenses();
+  }, []);
 
   const fetchIncome = async () => {
-    const userId = localStorage.getItem('userId'); // Get userId from local storage
+    const userId = localStorage.getItem('userId');
     try {
       const response = await getIncome(userId);
       if (response && response.data) {
-        const incomeEntries = response.data; // Assume response.data is an array of income entries
-        setIncomes(incomeEntries); // Set incomes from response
-        const totalIncome = incomeEntries.reduce((acc, curr) => acc + curr.amount, 0); // Calculate total income
-        setIncome(totalIncome); // Update income state with total
+        const incomeEntries = response.data;
+        setIncomes(incomeEntries);
+        const totalIncome = incomeEntries.reduce((acc, curr) => acc + curr.amount, 0);
+        setIncome(totalIncome);
       }
     } catch (error) {
       console.error('Error fetching income:', error);
+    }
+  };
+
+  const fetchSavingsGoal = async () => {
+    const userId = localStorage.getItem('userId');
+    try {
+      const response = await getsavings(userId);
+      if (response && response.data) {
+        setSavings(response.data);
+      }
+    } catch (error) {
+      console.error('Error fetching savings goals:', error);
     }
   };
 
@@ -40,7 +53,7 @@ const Dashboard = () => {
     const amount = parseFloat(newIncome);
     if (isNaN(amount)) return;
 
-    const userId = localStorage.getItem('userId'); // Ensure 'userId' is stored in localStorage
+    const userId = localStorage.getItem('userId');
     const incomeData = {
       userId,
       amount,
@@ -49,43 +62,42 @@ const Dashboard = () => {
     try {
       const response = await addincome(incomeData);
       if (response.status === 200) {
-        // Update income list and total income
-        setIncomes((prevIncomes) => [...prevIncomes, { amount }]); // Add new income entry
-        setIncome((prevIncome) => prevIncome + amount); // Update total income
-        setNewIncome(''); // Clear input field
+        setIncomes((prevIncomes) => [...prevIncomes, { amount }]);
+        setIncome((prevIncome) => prevIncome + amount);
+        setNewIncome('');
       } else {
         console.error('Failed to add income');
       }
     } catch (error) {
       console.error('Error adding income:', error);
     } finally {
-      await fetchIncome(); // Refresh income data after adding
+      await fetchIncome();
     }
   };
 
   const handleSavingsGoalSubmit = async (e) => {
     e.preventDefault();
-    const amount = parseFloat(newSavingsGoal);
-    if (isNaN(amount)) return;
+    const save = parseFloat(newSavingsGoal);
+    if (isNaN(save)) return;
 
-    const userId = localStorage.getItem('userId'); // Ensure 'userId' is stored in localStorage
+    const userId = localStorage.getItem('userId');
     const savingsData = {
       userId,
-      goal: amount, // Assuming the API expects a key 'goal' for the savings amount
+      goal: save,
     };
 
     try {
       const response = await addsavings(savingsData);
       if (response.status === 200) {
-        setSavingsGoal(amount);
-        setNewSavingsGoal(''); // Clear input field
+        setSavings((prevSavings) => [...prevSavings, { goal: save }]);
+        setNewSavingsGoal('');
       } else {
         console.error('Failed to add savings goal');
       }
     } catch (error) {
       console.error('Error adding savings goal:', error);
     } finally {
-      await fetchIncome(); // Refresh income data after adding
+      await fetchSavingsGoal();
     }
   };
 
@@ -94,7 +106,7 @@ const Dashboard = () => {
     const amount = parseFloat(expenseAmount);
     if (isNaN(amount)) return;
 
-    const userId = localStorage.getItem('userId'); // Ensure 'userId' is stored in localStorage
+    const userId = localStorage.getItem('userId');
     const expenseData = {
       userId,
       expenses: [
@@ -112,8 +124,6 @@ const Dashboard = () => {
       if (response.status === 200) {
         setExpenses((prevExpenses) => prevExpenses + amount);
         setShowExpenseModal(false);
-
-        // Reset form fields
         setExpenseDate('');
         setExpenseCategory('');
         setExpenseAmount('');
@@ -123,20 +133,16 @@ const Dashboard = () => {
       }
     } catch (error) {
       console.error('Error adding expense:', error);
-    } finally {
-      await fetchIncome(); // Refresh income data after adding
     }
   };
 
-
   const handleDeleteIncome = async (incomeId) => {
-    const userId = localStorage.getItem('userId'); // Get userId from local storage
+    const userId = localStorage.getItem('userId');
     try {
-      const response = await deleteIncome(userId, incomeId); // Call deleteIncome API
+      const response = await deleteIncome(userId, incomeId);
       if (response.status === 200) {
-        // Update state to remove deleted income
-        setIncomes((prevIncomes) => prevIncomes.filter((income) => income._id !== incomeId)); // Remove income from the list
-        setIncome((prevIncome) => prevIncome - incomes.find((income) => income._id === incomeId).amount); // Update total income
+        setIncomes((prevIncomes) => prevIncomes.filter((income) => income._id !== incomeId));
+        setIncome((prevIncome) => prevIncome - incomes.find((income) => income._id === incomeId).amount);
       } else {
         console.error('Failed to delete income');
       }
@@ -145,8 +151,36 @@ const Dashboard = () => {
     }
   };
 
+  const handleDeleteSavingsGoal = async (savingsId) => {
+    if (!savingsId) {
+      console.error('Invalid savingsId');
+      return;
+    }
+    const userId = localStorage.getItem('userId');
+    try {
+      const response = await deleteSavingsGoal(userId, savingsId);
+      if (response.status === 200) {
+        setSavings((prevSavings) => prevSavings.filter((savings) => savings._id !== savingsId));
+      } else {
+        console.error('Failed to delete savings goal');
+      }
+    } catch (error) {
+      console.error('Error deleting savings goal:', error);
+    }
+  };
 
-  
+  const fetchExpenses = async () => {
+    const userId = localStorage.getItem('userId');
+    try {
+      const response = await getExpenses(userId);
+      if (response && response.data && response.data.expenses) {
+        const totalExpenses = response.data.expenses.reduce((acc, curr) => acc + curr.amount, 0);
+        setExpenses(totalExpenses);
+      }
+    } catch (error) {
+      console.error('Error fetching expenses:', error);
+    }
+  };
 
   const currentSavings = income - expenses;
 
@@ -156,7 +190,7 @@ const Dashboard = () => {
       <div className="row mb-4">
         <div className="col-md-3">
           <div className="card">
-            <div className="card-body" style={{height:'210px'}}>
+            <div className="card-body" style={{ height: '180px' }}>
               <h5 className="card-title">Income</h5>
               {incomes.map((income, index) => (
                 <div key={index} className="d-flex justify-content-between align-items-center">
@@ -164,11 +198,10 @@ const Dashboard = () => {
                   <AiOutlineDelete
                     className="text-danger"
                     style={{ cursor: 'pointer', marginLeft: '10px' }}
-                    onClick={() =>handleDeleteIncome(income._id) } // Pass the income ID for deletion
+                    onClick={() => handleDeleteIncome(income._id)}
                   />
                 </div>
               ))}
-              {/* Conditionally render income input if total income is 0 */}
               {income <= 0 && (
                 <form onSubmit={handleIncomeSubmit} className="mt-2">
                   <div className="input-group">
@@ -192,19 +225,13 @@ const Dashboard = () => {
             <div className="card-body">
               <h5 className="card-title">Expenses</h5>
               <p className="card-text fs-2">${expenses.toFixed(2)}</p>
-              <button
-                className="btn btn-sm btn-primary float-end"
-                style={{ marginRight: '-15px', height: '60px', backgroundColor: '#343333' }}
-                onClick={() => setShowExpenseModal(true)}
-              >
-                Add Expenses
-              </button>
+              <button className="btn btn-primary" style={{marginLeft:'-15px',backgroundColor:'#343333'}} onClick={() => setShowExpenseModal(true)}>Add Expense</button>
             </div>
           </div>
         </div>
         <div className="col-md-3">
-          <div className="card" style={{ height: '210px' }}>
-            <div className="card-body">
+          <div className="card">
+            <div className="card-body"style={{height:'180px'}}>
               <h5 className="card-title">Current Savings</h5>
               <p className="card-text fs-2">${currentSavings.toFixed(2)}</p>
             </div>
@@ -212,28 +239,41 @@ const Dashboard = () => {
         </div>
         <div className="col-md-3">
           <div className="card">
-            <div className="card-body">
-              <h5 className="card-title">Savings Goal</h5>
-              <p className="card-text fs-2">${savingsGoal.toFixed(2)}</p>
-              <form onSubmit={handleSavingsGoalSubmit} className="mt-2">
-                <div className="input-group">
-                  <input
-                    type="number"
-                    className="form-control"
-                    value={newSavingsGoal}
-                    onChange={(e) => setNewSavingsGoal(e.target.value)}
-                    placeholder="Enter goal amount"
-                    style={{ height: '60px', marginTop: '20px' }}
-                  />
-                  <button type="submit" className="btn btn-primary" style={{ width: '100px', height: '60px', backgroundColor: '#343333' }}>Set Goal</button>
-                </div>
-              </form>
+            <div className="card-body" style={{height:'180px'}}>
+              <h5 className="card-title">Savings Goals</h5>
+              {savings && savings.length > 0 ? (
+                savings.map((goal) => (
+                  <div key={goal._id} className="d-flex justify-content-between align-items-center mb-2">
+                    <p className="card-text fs-2">${goal.goal}</p>
+                    <AiOutlineDelete
+                      className="text-danger"
+                      style={{ cursor: 'pointer', marginLeft: '10px' }}
+                      onClick={() => handleDeleteSavingsGoal(goal._id)}
+                    />
+                  </div>
+                ))
+              ) : (
+                <form onSubmit={handleSavingsGoalSubmit} className="mt-2">
+                  <div className="input-group" style={{height:'140px'}}>
+                    <input
+                      type="number"
+                      className="form-control"
+                      value={newSavingsGoal}
+                      onChange={(e) => setNewSavingsGoal(e.target.value)}
+                      placeholder="Set a savings goal"
+                      style={{ height: '60px', marginTop: '20px' }}
+                    />
+                    <button type="submit" className="btn btn-primary" style={{ width: '100px', height: '60px', backgroundColor: '#343333' }}>Set Goal</button>
+                  </div>
+                </form>
+              )}
             </div>
           </div>
         </div>
       </div>
+
       {showExpenseModal && (
-        <div className="modal show" style={{ display: 'block' }}>
+        <div className="modal show d-block" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
           <div className="modal-dialog">
             <div className="modal-content">
               <div className="modal-header">
@@ -246,8 +286,8 @@ const Dashboard = () => {
                     <label htmlFor="expenseDate" className="form-label" style={{color:'black'}}>Date</label>
                     <input
                       type="date"
-                      id="expenseDate"
                       className="form-control"
+                      id="expenseDate"
                       value={expenseDate}
                       onChange={(e) => setExpenseDate(e.target.value)}
                     />
@@ -256,8 +296,8 @@ const Dashboard = () => {
                     <label htmlFor="expenseCategory" className="form-label" style={{color:'black'}}>Category</label>
                     <input
                       type="text"
-                      id="expenseCategory"
                       className="form-control"
+                      id="expenseCategory"
                       value={expenseCategory}
                       onChange={(e) => setExpenseCategory(e.target.value)}
                     />
@@ -266,8 +306,8 @@ const Dashboard = () => {
                     <label htmlFor="expenseAmount" className="form-label" style={{color:'black'}}>Amount</label>
                     <input
                       type="number"
-                      id="expenseAmount"
                       className="form-control"
+                      id="expenseAmount"
                       value={expenseAmount}
                       onChange={(e) => setExpenseAmount(e.target.value)}
                     />
@@ -275,8 +315,8 @@ const Dashboard = () => {
                   <div className="mb-3">
                     <label htmlFor="expenseDescription" className="form-label" style={{color:'black'}}>Description</label>
                     <textarea
-                      id="expenseDescription"
                       className="form-control"
+                      id="expenseDescription"
                       value={expenseDescription}
                       onChange={(e) => setExpenseDescription(e.target.value)}
                     />
