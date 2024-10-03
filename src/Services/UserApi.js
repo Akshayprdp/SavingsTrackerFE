@@ -20,6 +20,9 @@ export const userLogin = (values) => {
 export const getExpenses = (userId) => {
   return userInstance.get(`/getExpenses/${userId}`);
 };
+export const deleteexpenses = (userId, expenseId) => {
+  return userInstance.delete(`/removeExpense/${userId}/${expenseId}`);
+};
 
 export const addincome = (values) => {
   return userInstance.post('/addincome',{...values});

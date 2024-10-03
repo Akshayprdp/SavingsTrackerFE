@@ -1,8 +1,6 @@
-// Expenses.js
-
 import React, { useEffect, useState } from 'react';
 import { FaEdit, FaTrash } from 'react-icons/fa'; // Importing edit and delete icons
-import { getExpenses } from '../../../Services/UserApi'; // Adjust the import path for your API functions
+import { getExpenses,deleteexpenses } from '../../../Services/UserApi'; // Adjust the import path for your API functions
 
 const Expenses = () => {
   const [expenses, setExpenses] = useState([]);
@@ -11,35 +9,38 @@ const Expenses = () => {
   useEffect(() => {
     const fetchExpenses = async () => {
       try {
-        const response = await getExpenses(userId); // Use the getExpenses API function
-
-        // Check if the response is successful and has expenses
-        if (response && response.success) {
-          setExpenses(response.expenses); // Set the expenses from the response
+        const response = await getExpenses(userId); // Assuming getExpenses fetches data using Axios
+        
+        // Log the full response to inspect
+        console.log('API response:', response);
+        
+        // Use response.data to access the actual payload
+        if (response.data && response.data.success) {
+          setExpenses(response.data.expenses); // Set expenses correctly
         } else {
-          console.error('Failed to fetch expenses:', response);
+          console.error('Failed to fetch expenses:', response.data); // Log response in case of failure
         }
       } catch (error) {
-        console.error('Error fetching expenses:', error);
+        console.error('Error fetching expenses:', error); // Log the error from the catch block
       }
     };
-
+  
     fetchExpenses();
   }, [userId]);
+  
 
   const handleEdit = (expense) => {
-    // Implement the logic for editing an expense
-    console.log('Edit expense:', expense);
+    console.log('Edit expense:', expense); // Edit logic placeholder
   };
 
   const handleDelete = async (expenseId) => {
-    // Uncomment the delete logic here if you have a delete endpoint set up
-    // try {
-    //   await userInstance.delete(`/deleteExpense/${expenseId}`);
-    //   setExpenses(expenses.filter(expense => expense._id !== expenseId)); // Update state to remove the deleted expense
-    // } catch (error) {
-    //   console.error('Error deleting expense:', error);
-    // }
+    const userId = localStorage.getItem('userId'); // Fetch userId from localStorage
+    try {
+      await deleteexpenses(userId, expenseId); // Call deleteexpenses with userId and expenseId
+      setExpenses(expenses.filter(expense => expense._id !== expenseId)); // Update the state to remove the deleted expense
+    } catch (error) {
+      console.error('Error deleting expense:', error);
+    }
   };
 
   return (
@@ -63,19 +64,19 @@ const Expenses = () => {
               {expenses.length > 0 ? (
                 expenses.map((expense, index) => (
                   <tr key={expense._id}>
-                    <td>{index + 1}</td> {/* Use index for No column */}
-                    <td>{new Date(expense.date).toLocaleDateString()}</td> {/* Format the date */}
-                    <td>{expense.category}</td>
-                    <td>${expense.amount.toFixed(2)}</td>
-                    <td>{expense.description}</td>
+                    <td>{index + 1}</td> {/* Row number */}
+                    <td>{new Date(expense.date).toLocaleDateString()}</td> {/* Formatted date */}
+                    <td>{expense.category}</td> {/* Category */}
+                    <td>${expense.amount.toFixed(2)}</td> {/* Formatted amount */}
+                    <td>{expense.description}</td> {/* Description */}
                     <td>
                       <FaEdit
                         style={{ cursor: 'pointer', color: '#007bff', marginRight: '10px' }}
-                        onClick={() => handleEdit(expense)}
+                        onClick={() => handleEdit(expense)} // Edit functionality
                       />
                       <FaTrash
                         style={{ cursor: 'pointer', color: '#dc3545' }}
-                        onClick={() => handleDelete(expense._id)} // Use expense._id for deletion
+                        onClick={() => handleDelete(expense._id)} // Delete functionality
                       />
                     </td>
                   </tr>

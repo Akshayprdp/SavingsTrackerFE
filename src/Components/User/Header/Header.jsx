@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import './Header.css';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useNavigate } from 'react-router-dom';
 import { faUser, faUserPlus, faCreditCard, faChartBar } from '@fortawesome/free-solid-svg-icons';
 
 function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem('jwt');
@@ -30,13 +32,9 @@ function Header() {
     localStorage.removeItem('userId'); 
     setIsLoggedIn(false);
     setUsername('');
-  };
 
-  const handleProtectedNavigation = (e, path) => {
-    if (!isLoggedIn) {
-      e.preventDefault();
-      // navigate('/'); // Uncomment this line if you have navigation implemented
-    }
+    navigate('/login');
+    
   };
 
   return (

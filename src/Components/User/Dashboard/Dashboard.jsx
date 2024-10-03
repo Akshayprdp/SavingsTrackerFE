@@ -239,7 +239,7 @@ const Dashboard = () => {
                     required
                   ></textarea>
                 </div>
-                <button type="submit" className="btn btn-primary" style={{ backgroundColor: '#343333' }}>Add Expense</button>
+                <button type="submit" className="btn btn-primary" style={{ backgroundColor: '#343333',marginLeft:'70px' }}>Add Expense</button>
               </form>
             </div>
           </div>
