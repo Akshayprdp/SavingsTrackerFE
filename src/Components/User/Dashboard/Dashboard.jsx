@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { addExpense, addincome, addsavings, getIncome, deleteIncome, getsavings, deleteSavingsGoal,getExpenses } from '../../../Services/UserApi'; // Adjust the path as per your file structure
+import { addExpense, addincome, addsavings, getIncome, deleteIncome, getsavings, deleteSavingsGoal, getExpenses } from '../../../Services/UserApi'; // Adjust the path as per your file structure
 import { AiOutlineDelete } from 'react-icons/ai'; // Import the delete icon
 
 const Dashboard = () => {
@@ -184,7 +184,18 @@ const Dashboard = () => {
 
   const currentSavings = income - expenses;
 
+  useEffect(() => {
+    if (savings.length > 0) {
+      const savingsGoal = savings[0].goal;
+      if (currentSavings < savingsGoal) {
+        alert(`You are short of your savings goal by $${(savingsGoal - currentSavings).toFixed(2)}`);
+      }
+    }
+  }, [currentSavings, savings]);
+
   return (
+    // ... rest of the code remains the same ...
+  
     <div className="container mt-5">
       <h1 className="mb-4">Financial Tracker</h1>
       <div className="row mb-4">
