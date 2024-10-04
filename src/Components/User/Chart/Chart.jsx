@@ -31,7 +31,7 @@ const Chart = () => {
   const [expenses, setExpenses] = useState(0);
   const [income, setIncome] = useState(0);
 
-  // Function to fetch expenses
+  // Fetch expenses
   const fetchExpenses = async () => {
     const userId = localStorage.getItem("userId");
     try {
@@ -45,15 +45,15 @@ const Chart = () => {
     }
   };
 
-  // Function to fetch income
+  // Fetch income
   const fetchIncome = async () => {
     const userId = localStorage.getItem("userId");
     try {
       const response = await getIncome(userId);
       if (response && response.data) {
-        const incomeData = response.data; // Assuming the API returns the array of income objects
+        const incomeData = response.data; 
         if (incomeData.length > 0) {
-          setIncome(incomeData[0].amount); // Assuming there is at least one income entry
+          setIncome(incomeData[0].amount); 
         }
       }
     } catch (error) {
@@ -61,25 +61,25 @@ const Chart = () => {
     }
   };
 
-  // Fetch expenses and income when the component mounts
+  // Fetch data on mount
   useEffect(() => {
     fetchExpenses();
     fetchIncome();
   }, []);
 
-  // Update chart data when income or expenses change
+  // Update chart when income or expenses change
   useEffect(() => {
-    const savings = income - expenses; // Calculate savings as income - expenses
+    const savings = income - expenses; 
 
     setChartData({
       labels: ["Income", "Savings", "Expenses"],
       datasets: [
         {
           label: "Financial Overview",
-          data: [income, savings, expenses], // Use calculated savings
+          data: [income, savings, expenses],
           backgroundColor: [
             "rgba(43, 63, 229, 0.8)", // Blue for Income
-            "rgba(0, 255, 0, 0.8)", // Yellow for Savings
+            "rgba(0, 255, 0, 0.8)",   // Green for Savings
             "rgba(255, 0, 0, 0.8)",   // Red for Expenses
           ],
           borderColor: [
@@ -93,11 +93,10 @@ const Chart = () => {
   }, [income, expenses]);
 
   return (
-    <div style={{ marginTop: '100px' }}>
-      <p><b style={{marginLeft:'610px'}}>Income vs Expense</b></p>
+    <div className="chartContainer">
+      <p className="chartTitle"><b>Income vs Expense</b></p>
       <div className="dataCard categoryCard">
-        
-        <Doughnut
+        <Doughnut className="dougnut"
           data={chartData}
           options={{
             plugins: {
@@ -107,9 +106,9 @@ const Chart = () => {
               },
             },
             responsive: true,
-            maintainAspectRatio: false,
+            // maintainAspectRatio: false,
           }}
-        />
+         />
       </div>
     </div>
   );
