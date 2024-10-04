@@ -12,7 +12,7 @@ function Homepage() {
       <Header/>
       {/* <Home/> */}
       <Dashboard/>
-      {/* <Chart/> */}
+      <Chart/>
     
      
     </div>

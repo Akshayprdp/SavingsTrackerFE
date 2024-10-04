@@ -1,60 +1,51 @@
-// import React from 'react';
-// import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
-// import { Card, CardHeader, CardContent } from '@/components/ui/card';
-// import { Progress } from '@/components/ui/progress';
+import React from "react";
+import { Chart as ChartJS, defaults } from "chart.js/auto";
+import { Bar, Doughnut, Line } from "react-chartjs-2";
+import "./Chart.css";
+import sourceData from "../../Data/SourceData.json";
 
-// const data = [
-//   { name: 'Income', value: 27200 },
-//   { name: 'Expenses', value: 19900 },
-// ];
+defaults.maintainAspectRatio = false;
+defaults.responsive = true;
 
-// const COLORS = ['#4CAF50', '#FFA726'];
+defaults.plugins.title.display = true;
+defaults.plugins.title.align = "start";
+defaults.plugins.title.font.size = 20;
+defaults.plugins.title.color = "black";
 
-// const savingsGoal = 10000;
-// const currentSavings = 6000;
-
-// const Chart = () => {
-//   const savingsProgress = (currentSavings / savingsGoal) * 100;
-
-//   return (
-//     <div className="space-y-4">
-//       <Card>
-//         <CardHeader>Income vs. Expenses</CardHeader>
-//         <CardContent>
-//           <ResponsiveContainer width="100%" height={300}>
-//             <PieChart>
-//               <Pie
-//                 data={data}
-//                 cx="50%"
-//                 cy="50%"
-//                 labelLine={false}
-//                 outerRadius={80}
-//                 fill="#8884d8"
-//                 dataKey="value"
-//                 label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-//               >
-//                 {data.map((entry, index) => (
-//                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-//                 ))}
-//               </Pie>
-//               <Tooltip formatter={(value) => `$${value.toLocaleString()}`} />
-//               <Legend />
-//             </PieChart>
-//           </ResponsiveContainer>
-//         </CardContent>
-//       </Card>
-
-//       <Card>
-//         <CardHeader>Savings Goal Progress</CardHeader>
-//         <CardContent>
-//           <Progress value={savingsProgress} className="w-full" />
-//           <p className="mt-2 text-center">
-//             ${currentSavings.toLocaleString()} / ${savingsGoal.toLocaleString()} ({savingsProgress.toFixed(1)}%)
-//           </p>
-//         </CardContent>
-//       </Card>
-//     </div>
-//   );
-// };
-
-// export default Chart;
+export const Chart = () => {
+  return (
+    <div className="App">
+      <div className="dataCard categoryCard">
+        <Doughnut
+          data={{
+            labels: sourceData.map((data) => data.label),
+            datasets: [
+              {
+                label: "Count",
+                data: sourceData.map((data) => data.value),
+                backgroundColor: [
+                  "rgba(43, 63, 229, 0.8)",
+                  "rgba(250, 192, 19, 0.8)",
+                  "rgba(253, 135, 135, 0.8)",
+                ],
+                borderColor: [
+                  "rgba(43, 63, 229, 0.8)",
+                  "rgba(250, 192, 19, 0.8)",
+                  "rgba(253, 135, 135, 0.8)",
+                ],
+              },
+            ],
+          }}
+          options={{
+            plugins: {
+              title: {
+                text: "Revenue Sources",
+              },
+            },
+          }}
+        />
+      </div>
+    </div>
+  );
+};
+export default Chart;
