@@ -1,4 +1,3 @@
-// Expenses.js
 import React, { useEffect, useState } from 'react';
 import { FaEdit, FaTrash } from 'react-icons/fa'; // Importing edit and delete icons
 import { getExpenses, deleteexpenses, updateExpense } from '../../../Services/UserApi'; // Adjust the import path for your API functions
@@ -176,7 +175,7 @@ const Expenses = () => {
                   ></textarea>
                 </div>
                 <div className="d-flex justify-content-center">
-                <button type="submit" style={{ backgroundColor: '#343333'}}>Save Changes</button>
+                <button type="submit"  className="btn btn-primary" style={{backgroundColor:'#343333',marginLeft:'10px'}}>Save Changes</button>
                 </div>
               </form>
             </div>

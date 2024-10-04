@@ -34,7 +34,6 @@ function Header() {
     setUsername('');
 
     navigate('/login');
-    
   };
 
   return (
@@ -48,6 +47,7 @@ function Header() {
             <ul className="navbar-nav me-auto">
               <li className="nav-item">
                 <Link className="nav-link active" aria-current="page" to="/">
+                  <img src="/icon.png" alt="Icon" className="navbar-icon" />
                   <h1 className="navbar-brand mx-auto">Personal Finance Tracker</h1>
                 </Link>
               </li>
