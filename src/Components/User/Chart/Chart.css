@@ -1,35 +1,73 @@
 .App {
-    height: 100vh;
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    align-content: center;
-    gap: 2vw;
-    flex-wrap: wrap;
-    background-color: #ddd;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column; /* Changed for responsiveness */
+  align-items: center;
+  justify-content: center;
+  gap: 2vw;
+  background-color: #f4f4f4; /* Softer background */
+}
+
+.dataCard {
+  background-color: #ffffff;
+  border-radius: 0.75em;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Softer shadow */
+  padding: 1.5em; /* More padding for better breathing space */
+  margin: 1em;
+  transition: transform 0.2s ease; /* Subtle hover effect */
+}
+
+.dataCard:hover {
+  transform: translateY(-5px); /* Lift the card slightly on hover */
+}
+
+.categoryCard {
+  width: 40%;
+  height: auto; /* Allow height to adapt based on content */
+}
+
+p {
+  font-size: 1.25em;
+  font-weight: 600;
+  color: #333333; /* Darker text for better readability */
+  text-align: center; /* Center text */
+  margin-bottom: 0.5em;
+}
+
+/* Media query for tablets */
+@media (max-width: 768px) {
+  .categoryCard {
+    width: 60%; 
+    height: auto;
+    margin-left: 0; 
   }
-  
+
   .dataCard {
-    background-color: #efefef;
-    border-radius: 0.5em;
-    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+    width: 90%; /* Wider on tablets */
+    height: auto;
     padding: 1em;
   }
-  
-  .revenueCard {
-    width: 92%;
-    height: 20rem;
+
+  p {
+    font-size: 1.1em; /* Slightly smaller font on smaller screens */
   }
-  
-  .customerCard {
-    width: 50%;
-    height: 20rem;
-  }
-  
+}
+
+/* Media query for smaller screens */
+@media (max-width: 480px) {
   .categoryCard {
-    width: 40%;
-    height: 20rem;
+    width: 100%; /* Full width on very small screens */
+    height: auto;
   }
-  
+
+  .dataCard {
+    width: 100%;
+    height: auto;
+    padding: 1em;
+  }
+
+  p {
+    font-size: 1em; /* Even smaller for very small devices */
+  }
+}

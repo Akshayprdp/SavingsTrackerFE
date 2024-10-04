@@ -1,14 +1,14 @@
 [
     {
-      "label": "Ads",
+      "label": "Income",
       "value": 32
     },
     {
-      "label": "Subscriptions",
+      "label": "savings",
       "value": 45
     },
     {
-      "label": "Sponsorships",
+      "label": "Expenses",
       "value": 23
     }
   ]
