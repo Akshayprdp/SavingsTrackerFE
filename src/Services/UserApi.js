@@ -21,7 +21,7 @@ export const getExpenses = (userId) => {
   return userInstance.get(`/getExpenses/${userId}`);
 };
 
-export const updateExpense = (userId, expenseId, updatedExpenseData) => {
+export const updateExpense = (userId, expenseId,updatedExpenseData) => {
   return userInstance.put(`/updateExpense/${userId}/${expenseId}`, updatedExpenseData);
 };
 // export const updateExpense = (updatedExpenseData) => {

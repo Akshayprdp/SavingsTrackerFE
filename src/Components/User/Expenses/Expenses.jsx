@@ -1,3 +1,4 @@
+// Expenses.js
 import React, { useEffect, useState } from 'react';
 import { FaEdit, FaTrash } from 'react-icons/fa'; // Importing edit and delete icons
 import { getExpenses, deleteexpenses, updateExpense } from '../../../Services/UserApi'; // Adjust the import path for your API functions
@@ -45,7 +46,6 @@ const Expenses = () => {
       setExpenses(expenses.filter(expense => expense._id !== expenseId)); // Update the state to remove the deleted expense
     } catch (error) {
       console.error('Error deleting expense:', error);
-     
     }
   };
 
@@ -53,16 +53,15 @@ const Expenses = () => {
     e.preventDefault();
     if (selectedExpense) {
       const updatedExpenseData = {
-        expenseId: selectedExpense._id, // Ensure you include the expenseId
-        expenseDate,
-        expenseCategory,
-        expenseAmount,
-        expenseDescription,
+        Category: expenseCategory,
+        Amount: parseFloat(expenseAmount),
+        Description: expenseDescription,
+        date: expenseDate,
       };
       try {
         // Call the updateExpense API function
-        const response = await updateExpense(updatedExpenseData); // Send the complete data
-        if (response.data && response.data.status) { // Adjusted to check for status instead of success
+        const response = await updateExpense(userId, selectedExpense._id, updatedExpenseData); // Send the complete data
+        if (response.data && response.data.success) { // Adjusted to check for success instead of status
           // Update the state with the updated expense
           setExpenses(expenses.map(exp => (exp._id === selectedExpense._id ? response.data.updatedExpense : exp)));
           setShowExpenseModal(false); // Close the modal
@@ -104,7 +103,7 @@ const Expenses = () => {
                     <td>
                       <FaEdit
                         style={{ cursor: 'pointer', color: '#007bff', marginRight: '10px' }}
-                        onClick={() => handleEdit(expense)} // Edit functionality
+                        onClick={() => handleEdit(expense)} // Pass the individual expense object
                       />
                       <FaTrash
                         style={{ cursor: 'pointer', color: '#dc3545' }}
@@ -176,7 +175,9 @@ const Expenses = () => {
                     required
                   ></textarea>
                 </div>
-                <button type="submit" className="btn btn-primary" style={{ backgroundColor: '#343333', marginLeft: '70px' }}>Save Changes</button>
+                <div className="d-flex justify-content-center">
+                <button type="submit" style={{ backgroundColor: '#343333'}}>Save Changes</button>
+                </div>
               </form>
             </div>
           </div>

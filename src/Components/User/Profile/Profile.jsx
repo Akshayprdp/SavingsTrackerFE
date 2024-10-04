@@ -82,20 +82,6 @@ function Profile() {
             onChange={handleChange}
             readOnly
           />
-          <label>Password</label>
-          <input
-            type="password"
-            name="password"
-            value={userInfo.password}
-            onChange={handleChange}
-          />
-          <label>Confirm Password</label>
-          <input
-            type="password"
-            name="confirmPassword"
-            value={userInfo.confirmPassword}
-            onChange={handleChange}
-          />
           <label>Phone Number</label>
           <input
             type="text"
@@ -105,21 +91,22 @@ function Profile() {
           />
           <button onClick={handleSave}>Save</button>
         </div>
-      </div>
+      </div>     
       <div className="faq-div">
         <h2>Frequently Asked Questions</h2>
         <div className="faq-item">
-          <h4>How can I reset my password?</h4>
-          <p>Click on the "Forgot Password" link on the login page and follow the instructions.</p>
+          <h4>Can I change my email?</h4>
+          <p>ou can contact customer support through the contact form on our website or by calling our support number.</p>
         </div>
         <div className="faq-item">
-          <h4>How can I change my email address?</h4>
-          <p>You can change your email address in the profile section by editing the email field and saving the changes.</p>
+          <h4>How can I reset my Phonenumber?</h4>
+          <p>You can change your Phonenumber in the profile section by Phonenumber the Username and saving the changes.</p>
         </div>
         <div className="faq-item">
-          <h4>How can I contact customer support?</h4>
-          <p>You can contact customer support through the contact form on our website or by calling our support number.</p>
+          <h4>How can I change my Username?</h4>
+          <p>You can change your Username in the profile section by editing the Username and saving the changes.</p>
         </div>
+        
       </div>
     </div>
   );

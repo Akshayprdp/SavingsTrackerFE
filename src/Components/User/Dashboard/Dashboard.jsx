@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { addExpense, addincome, addsavings, getIncome, deleteIncome, getsavings, deleteSavingsGoal, getExpenses } from '../../../Services/UserApi'; // Adjust the path as per your file structure
 import { AiOutlineDelete } from 'react-icons/ai'; // Import the delete icon
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Dashboard = () => {
   const [income, setIncome] = useState(0);
@@ -14,6 +16,7 @@ const Dashboard = () => {
   const [expenseCategory, setExpenseCategory] = useState('');
   const [expenseAmount, setExpenseAmount] = useState('');
   const [expenseDescription, setExpenseDescription] = useState('');
+  const [hasShownToast, setHasShownToast] = useState(false);
 
   useEffect(() => {
     fetchIncome();
@@ -183,20 +186,31 @@ const Dashboard = () => {
   };
 
   const currentSavings = income - expenses;
-
+  
   useEffect(() => {
-    if (savings.length > 0) {
+    if (savings.length > 0 && !hasShownToast) {
       const savingsGoal = savings[0].goal;
       if (currentSavings < savingsGoal) {
-        alert(`You are short of your savings goal by $${(savingsGoal - currentSavings).toFixed(2)}`);
+        toast.error(`You are short of your savings goal by $${(savingsGoal - currentSavings).toFixed(2)}`, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+        setHasShownToast(true); // Mark the toast as shown
       }
     }
-  }, [currentSavings, savings]);
+  }, [currentSavings, savings, hasShownToast]);
+
 
   return (
-    // ... rest of the code remains the same ...
+    
   
-    <div className="container mt-5">
+    <div className="container mt-5 ">
+    <div className="container mt-4 w-100 h-25 p-3  rounded" style={{backgroundColor:'#e4e4e6'}}>
       <h1 className="mb-4">Financial Tracker</h1>
       <div className="row mb-4">
         <div className="col-md-3">
@@ -224,7 +238,9 @@ const Dashboard = () => {
                       placeholder="Enter amount"
                       style={{ height: '60px', marginTop: '20px' }}
                     />
+                    <div className='align-left'>
                     <button type="submit" className="btn btn-primary" style={{ width: '100px', height: '60px', backgroundColor: '#343333' }}>Add Income</button>
+                    </div>
                   </div>
                 </form>
               )}
@@ -236,7 +252,7 @@ const Dashboard = () => {
             <div className="card-body">
               <h5 className="card-title">Expenses</h5>
               <p className="card-text fs-2">${expenses.toFixed(2)}</p>
-              <button className="btn btn-primary" style={{marginLeft:'-15px',backgroundColor:'#343333'}} onClick={() => setShowExpenseModal(true)}>Add Expense</button>
+              <button className="btn btn-primary" style={{marginLeft:'25px',backgroundColor:'#343333',width:'200px'}} onClick={() => setShowExpenseModal(true)}>Add Expense</button>
             </div>
           </div>
         </div>
@@ -281,6 +297,7 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
+      </div>
       </div>
 
       {showExpenseModal && (
@@ -332,7 +349,11 @@ const Dashboard = () => {
                       onChange={(e) => setExpenseDescription(e.target.value)}
                     />
                   </div>
-                  <button type="submit" className="btn btn-primary" style={{marginLeft:'70px',backgroundColor:'#343333'}}>Add Expense</button>
+                  <div className='res'>
+                  <div className="d-flex justify-content-center">
+                  <button type="submit" style={{backgroundColor:'#343333',}}>Add Expense</button>
+                 </div>
+                  </div>
                 </form>
               </div>
             </div>

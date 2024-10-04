@@ -93,7 +93,7 @@ const Chart = () => {
   }, [income, expenses]);
 
   return (
-    <div className="chartContainer">
+    <div className="container mt-4 h-25 p-3  rounded d-flex flex-column justify-content-center align-items-center gap-3 ms-md-14 " style={{backgroundColor:'#e4e4e6'}}>
       <p className="chartTitle"><b>Income vs Expense</b></p>
       <div className="dataCard categoryCard">
         <Doughnut className="dougnut"
